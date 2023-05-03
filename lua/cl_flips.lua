@@ -30,6 +30,13 @@ surface.CreateFont("CxBold", {
     antialias = true
 })
 
+surface.CreateFont("CxMedium", {
+    font = "Inter Black",
+    extended = false,
+    size = ScrW() * 0.015,
+    antialias = true
+})
+
 surface.CreateFont("CxLarge", {
     font = "Inter Black",
     extended = false,
@@ -95,7 +102,7 @@ CXFLIPS.OpenFlip = function()
     end
 
     local Title = vgui.Create("DPanel", CXFLIPS.PrimaryPanel)
-    Title:SetSize(pw * 0.75, ph * 0.1)
+    Title:SetSize(pw, ph * 0.1)
     Title:Dock(TOP)
     Title:DockMargin(pw * 0.125, 10, pw * 0.125, 0)
     Title.Paint = function(self, w, h)
@@ -115,15 +122,15 @@ CXFLIPS.OpenFlip = function()
     CreatorAvatar:SetPlayer( creator, 256 )
 
     local Amount = vgui.Create("DPanel", CXFLIPS.PrimaryPanel)
-    Amount:SetSize(pw * 0.75, ph * 0.1)
-    Amount:Dock(BOTTOM)
-    Amount:DockMargin(10, 5, 10, 20)
+    Amount:SetSize(pw, ph * 0.1)
+    Amount:SetPos(0, ph * 0.85)
     Amount.Paint = function(self, w, h)
         draw.SimpleText("Bet Amount: $" .. flipInfo["amount"], "CxLarge", w * 0.5, h * 0.5, CXFLIPS.textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 
     timer.Simple(7, function()
         playing = false
+        local playerWinner = nil
         if (winner < 0.5) then
             -- Joiner won
             if (ply == joiner) then
@@ -133,6 +140,7 @@ CXFLIPS.OpenFlip = function()
                 chat.AddText(CXFLIPS.dangerousColor, "[CxFlips] You lost the flip!")
                 surface.PlaySound("buttons/button10.wav")
             end
+            playerWinner = joiner
         else
             -- Creator won
             if (ply == creator) then
@@ -142,6 +150,15 @@ CXFLIPS.OpenFlip = function()
                 chat.AddText(CXFLIPS.dangerousColor, "[CxFlips] You lost the flip!")
                 surface.PlaySound("buttons/button10.wav")
             end
+            playerWinner = creator
+        end
+
+        local WinnerLabel = vgui.Create("DPanel", CXFLIPS.PrimaryPanel)
+        WinnerLabel:SetSize(pw, ph * 0.2)
+        WinnerLabel:SetPos(0, (ph * 0.5) - (ph * 0.2 / 2))
+        WinnerLabel.Paint = function(self, w, h)
+            draw.RoundedBox(0, 0, 0, 0, 0, Color(0, 0, 0, 0))
+            draw.SimpleText("Winner: " .. playerWinner:GetName(), "CxMedium", w * 0.5, h * 0.5, CXFLIPS.textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
 
         net.Start("finishFlip")
@@ -285,7 +302,8 @@ CXFLIPS.OpenFlips = function()
 
         if (ply:getDarkRPVar("money") <= 0) then
             surface.PlaySound("buttons/button10.wav")
-            ply:ChatPrint(CXFLIPS.dangerousColor, "[CxFlips] You need to have atleast $1")
+            chat.AddText(CXFLIPS.dangerousColor, "[CxFlips] You need to have atleast $1")
+            return
         end
 
         net.Start("createFlip")
