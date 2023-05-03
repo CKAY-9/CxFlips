@@ -283,6 +283,11 @@ CXFLIPS.OpenFlips = function()
             cashAmount = 1
         end
 
+        if (ply:getDarkRPVar("money") <= 0) then
+            surface.PlaySound("buttons/button10.wav")
+            ply:ChatPrint(CXFLIPS.dangerousColor, "[CxFlips] You need to have atleast $1")
+        end
+
         net.Start("createFlip")
             net.WriteEntity(ply)
             net.WriteUInt(cashAmount, 32)

@@ -50,7 +50,7 @@ net.Receive("openFlip", function()
     local joiner = net.ReadEntity()
     local creator = net.ReadEntity()
 
-    if (joiner == creator or joined:getDarkRPVar("money") < CXFLIPS.activeFlips[creator:SteamID64()]["amount"] or CXFLIPS.activeFlips[creator:SteamID64()] == nil) then
+    if (joiner == creator or joiner:getDarkRPVar("money") < CXFLIPS.activeFlips[creator:SteamID64()]["amount"] or CXFLIPS.activeFlips[creator:SteamID64()] == nil) then
         return
     end
 
@@ -110,6 +110,9 @@ end)
 hook.Add("PlayerSay", "CxFlips.PlayerSay", function(ply, text, team)
     if (string.lower(text) == "!flips") then
         net.Start("openFlips")
+        if (CXFLIPS.activeFlips == nil) then
+            CXFLIPS.activeFlips = {}
+        end
         net.WriteTable(CXFLIPS.activeFlips)
         net.Send(ply)
     end
