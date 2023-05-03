@@ -404,3 +404,8 @@ end
 -- Recieve network
 net.Receive("openFlips", CXFLIPS.OpenFlips) -- Menu for creating and joining
 net.Receive("openFlip", CXFLIPS.OpenFlip) -- Actual game
+net.Receive("forceCloseMenu", function()
+    if (IsValid(CXFLIPS.Menu)) then
+        CXFLIPS.Menu:Remove()
+    end
+end)

@@ -6,6 +6,7 @@ util.AddNetworkString("createFlip")
 util.AddNetworkString("deleteFlip")
 util.AddNetworkString("finishFlip") -- Give money to winning player
 util.AddNetworkString("openFlip") -- Open specific flip game
+util.AddNetworkString("forceCloseMenu")
 
 net.Receive("createFlip", function()
     local creator = net.ReadEntity()
@@ -20,7 +21,8 @@ net.Receive("createFlip", function()
             creator = creator,
             amount = amount,
             winner = 0,
-            ongoing = false
+            ongoing = false,
+            joiner = nil
         }
     end
 end)
@@ -58,7 +60,18 @@ net.Receive("openFlip", function()
         CXFLIPS.activeFlips[creator:SteamID64()]["ongoing"] = true
     end
 
+    -- Check for joiner in other games
+    for key, value in ipairs(CXFLIPS.activeFlips) do
+        if (key == joiner:SteamID64()) then
+            CXFLIPS.activeFlips[joiner:SteamID64()] = nil
+        end
+        if (joiner == value["joiner"]) then
+            return
+        end
+    end
+
     math.randomseed(os.time())
+    CXFLIPS.activeFlips[creator:SteamID64()]["joiner"] = joiner
     CXFLIPS.activeFlips[creator:SteamID64()]["winner"] = math.Round(math.random(0, 1))
 
     net.Start("openFlip")
@@ -87,6 +100,8 @@ net.Receive("finishFlip", function()
     end
 
     timer.Simple(5, function()
+        net.Start("forceCloseMenu")
+        net.Send({joiner, creator})
         CXFLIPS.activeFlips[creator:SteamID64()] = nil
     end)
 end)
@@ -103,7 +118,12 @@ end)
 hook.Add("PlayerDisconnected", "CxFlips.PlayerLeave", function(ply)
     -- Clear flip
     if (CXFLIPS.activeFlips[ply:SteamID64()] ~= nil) then
-        ply:addMoney(CXFLIPS.activeFlips[ply:SteamID64()]["money"])
+        ply:addMoney(CXFLIPS.activeFlips[ply:SteamID64()]["amount"])
+        net.Start("forceCloseMenu")
+        net.Send({CXFLIPS.activeFlips[ply:SteamID64()]["joiner"], ply})
+        if (CXFLIPS.activeFlips[ply:SteamID64()]["joiner"] ~= nil) then
+            CXFLIPS.activeFlips[ply:SteamID64()]["joiner"]:addMoney(CXFLIPS.activeFlips[ply:SteamID64()]["amount"])
+        end
         CXFLIPS.activeFlips[ply:SteamID64()] = nil
     end
 end)
