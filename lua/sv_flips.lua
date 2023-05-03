@@ -11,7 +11,7 @@ net.Receive("createFlip", function()
     local creator = net.ReadEntity()
     local amount = net.ReadUInt(32)
 
-    if (CXFLIPS.activeFlips[creator:SteamID64()] ~= nil) then
+    if (CXFLIPS.activeFlips[creator:SteamID64()] ~= nil or creator:getDarkRPVar("money") < amount) then
         return
     else
         creator:addMoney(-amount)
@@ -48,7 +48,7 @@ net.Receive("openFlip", function()
     local joiner = net.ReadEntity()
     local creator = net.ReadEntity()
 
-    if (joiner == creator) then
+    if (joiner == creator or joined:getDarkRPVar("money") < CXFLIPS.activeFlips[creator:SteamID64()]["amount"] or CXFLIPS.activeFlips[creator:SteamID64()] == nil) then
         return
     end
 
@@ -56,10 +56,6 @@ net.Receive("openFlip", function()
         return
     else
         CXFLIPS.activeFlips[creator:SteamID64()]["ongoing"] = true
-    end
-
-    if (CXFLIPS.activeFlips[creator:SteamID64()] == nil) then
-        return
     end
 
     math.randomseed(os.time())
