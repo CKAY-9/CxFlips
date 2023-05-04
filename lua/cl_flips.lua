@@ -109,16 +109,32 @@ CXFLIPS.OpenFlip = function()
         draw.SimpleText("Flipping...", "CxLarge", w * 0.5, h * 0.5, CXFLIPS.textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 
-    local JoinerAvatar = vgui.Create("AvatarImage", CXFLIPS.PrimaryPanel)
-    JoinerAvatar:SetSize(ph * 0.5, ph * 0.5)
-    JoinerAvatar:Dock(LEFT)
-    JoinerAvatar:DockMargin(25, 0, 25, ph * 0.25)
+    local JoinerPanel = vgui.Create("DPanel", CXFLIPS.PrimaryPanel)
+    JoinerPanel:SetSize(ph * 0.6, ph * 0.8)
+    JoinerPanel:Dock(LEFT)
+    JoinerPanel:DockMargin(25, 0, 25, ph * 0.2)
+    JoinerPanel.Paint = function(self, w, h)
+        draw.RoundedBox(0, 0, 0, 0, 0, Color(0, 0, 0, 0))
+        draw.SimpleText(joiner:GetName(), "CxMedium", w * .5, h * .95, CXFLIPS.textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    end
+
+    local JoinerAvatar = vgui.Create("AvatarImage", JoinerPanel)
+    JoinerAvatar:Dock(FILL)
+    JoinerAvatar:DockMargin(0, 0, 0, ph * 0.1)
     JoinerAvatar:SetPlayer( joiner, 256 )
 
-    local CreatorAvatar = vgui.Create("AvatarImage", CXFLIPS.PrimaryPanel)
-    CreatorAvatar:SetSize(ph * 0.5, ph * 0.5)
-    CreatorAvatar:Dock(RIGHT)
-    CreatorAvatar:DockMargin(25, 0, 25, ph * 0.25)
+    local CreatorPanel = vgui.Create("DPanel", CXFLIPS.PrimaryPanel)
+    CreatorPanel:SetSize(ph * 0.6, ph * 0.8)
+    CreatorPanel:Dock(RIGHT)
+    CreatorPanel:DockMargin(25, 0, 25, ph * 0.2)
+    CreatorPanel.Paint = function(self, w, h)
+        draw.RoundedBox(0, 0, 0, 0, 0, Color(0, 0, 0, 0))
+        draw.SimpleText(creator:GetName(), "CxMedium", w * .5, h * .95, CXFLIPS.textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    end
+
+    local CreatorAvatar = vgui.Create("AvatarImage", CreatorPanel)
+    CreatorAvatar:Dock(FILL)
+    CreatorAvatar:DockMargin(0, 0, 0, ph * 0.1)
     CreatorAvatar:SetPlayer( creator, 256 )
 
     local Amount = vgui.Create("DPanel", CXFLIPS.PrimaryPanel)
