@@ -119,6 +119,8 @@ hook.Add("PlayerSay", "CxFlips.PlayerSay", function(ply, text, team)
 end)
 
 hook.Add("PlayerDisconnected", "CxFlips.PlayerLeave", function(ply)
+    if (CXFLIPS.activeFlips == nil) then return end
+
     -- Clear flip
     if (CXFLIPS.activeFlips[ply:SteamID64()] ~= nil) then
         ply:addMoney(CXFLIPS.activeFlips[ply:SteamID64()]["amount"])
